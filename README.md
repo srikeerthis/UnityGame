@@ -1,2 +1,2 @@
-# UnityGame
-Building the first game using the unity engine
+# Unity Game
+Building my first game using the unity engine
