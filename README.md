@@ -1,1 +1,2 @@
-Building the first game using unity engine.
+# Unity Game
+Building my first game using the unity engine.
