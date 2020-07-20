@@ -1,17 +1,19 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using TextMeshPro.UI;
 
 public class PlayerController : MonoBehaviour
 {
-    private float speed = 4500.0f;
-    private float xBound = 40.0f;
-    private float zBound = 60.0f;
+    private float jumpSpeed = 10500.0f;
+    private float xBound = 51.0f;
+    private float zBound = 86.0f;
     private Vector3 startPos;
     private Rigidbody playerRb;
     private SpawnManager spawnManager;
     private Animator playerAnim;
 
+    public TMPText tmptex;
     public GameObject focalPoint;
     public ParticleSystem powerupEffect;
     public bool hasPowerup;
@@ -39,12 +41,11 @@ public class PlayerController : MonoBehaviour
     {
         if(spawnManager.isGameActive)
         {
-            playerAnim.SetFloat("Speed_f",0.5f);
-            // float mouseX = Input.GetAxis("Mouse X");  
-            // transform.Rotate(Vector3.up * mouseX);
+            float mouseX = Input.GetAxis("Mouse X");  
+            transform.Rotate(Vector3.up * mouseX);
             
             float verticalInput = Input.GetAxis("Vertical");  
-            playerRb.AddForce(focalPoint.transform.forward * speed * verticalInput);
+            playerAnim.SetFloat("Speed_f",verticalInput);
         }   
     }
 
@@ -80,11 +81,16 @@ public class PlayerController : MonoBehaviour
 
     void OnPowerup()
     {
-        if(hasPowerup && Input.GetKeyDown(KeyCode.Space) && isOnGround && spawnManager.isGameActive)
+        if(hasPowerup && gameObject.name == "Powerup Jump" && Input.GetKeyDown(KeyCode.Space) && isOnGround && spawnManager.isGameActive)
         {
-            playerRb.AddForce(Vector3.up * speed * Time.deltaTime,ForceMode.Impulse);
-            playerAnim.SetBool("Jump_b",true);
+            playerRb.AddForce(Vector3.up * jumpSpeed * Time.deltaTime,ForceMode.Impulse);
             isOnGround = false;
+            playerAnim.SetBool("Jump_b",true);
+        }
+        if(hasPowerup && gameObject.name == "Powerup Speed" && isOnGround && spawnManager.isGameActive)
+        {
+            float verticalInput = Input.GetAxis("Vertical"); 
+            playerAnim.SetFloat("Speed_f",verticalInput * 2.0f);
         }
     }
 
@@ -98,6 +104,7 @@ public class PlayerController : MonoBehaviour
         if(collision.gameObject.CompareTag("Enemy"))
         {
             spawnManager.isGameActive = false;
+            powerupEffect.Stop();
             playerAnim.SetBool("Death_b",true);            
         }
     }

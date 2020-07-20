@@ -1,20 +1,21 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class SpawnManager : MonoBehaviour
 {
     public GameObject[] enemiesLeft;
     public GameObject[] enemiesRight;
-    public GameObject powerup; 
+    public GameObject[] powerup; 
     public bool isGameActive;
 
     private float spawnYpos = 0.75f;
-    private float spawnEnemyPosZ = 10.0f;
-    private float spawnEnemyPosX = 25.0f;
+    private float spawnEnemyPosZ = 8.0f;
+    private float spawnEnemyPosX = 50.0f;
 
-    private float spawnEnemyPosZRight = 15.0f;
-    private float spawnEnemyPosZRightEnd = 34.0f;
+    private float spawnEnemyPosZRight = 16.0f;
+    private float spawnEnemyPosZRightEnd = 33.0f;
 
     private float spawnPowerupPosX = 20.0f;
 
@@ -35,17 +36,26 @@ public class SpawnManager : MonoBehaviour
     {
         
     }
+    
+    void RestartGame()
+    {
+        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+    }
 
     void SpawnEnemiesRight()
     {
         if(isGameActive)
         {
             float RandomPosZ = Random.Range(spawnEnemyPosZRight,spawnEnemyPosZRightEnd);
+            float RandomPosZodd = Random.Range(spawnEnemyPosZRightEnd * 2  + 1,spawnEnemyPosZRight * 5 + 2);
+
             int randomIndex = Random.Range(0,enemiesRight.Length);
 
             Vector3 spawnPos = new Vector3(-spawnEnemyPosX,spawnYpos,RandomPosZ);
-           
+            Vector3 spawnPosOdd = new Vector3(-spawnEnemyPosX,spawnYpos,RandomPosZodd);
+
             Instantiate(enemiesRight[randomIndex],spawnPos,enemiesRight[randomIndex].transform.rotation);
+            Instantiate(enemiesRight[randomIndex],spawnPosOdd,enemiesRight[randomIndex].transform.rotation);
         }
     }
     void SpawnRandomEnemies()
@@ -53,7 +63,7 @@ public class SpawnManager : MonoBehaviour
         if(isGameActive)
         {
             float RandomPosZ = Random.Range(spawnEnemyPosZ,-spawnEnemyPosZ);
-            float RandomPosZodd = Random.Range(spawnEnemyPosZ*4,spawnEnemyPosZ * 5);
+            float RandomPosZodd = Random.Range(spawnEnemyPosZ*5 + 1,spawnEnemyPosZ * 7);
             
             int randomIndex = Random.Range(0,enemiesLeft.Length);
 
@@ -70,13 +80,14 @@ public class SpawnManager : MonoBehaviour
     {
         if(isGameActive)
         {
+            int randomIndex = Random.Range(0,powerup.Length);
             float RandomPosX = Random.Range(spawnPowerupPosX,-spawnPowerupPosX);
             float RandomPosZ = Random.Range(spawnEnemyPosZ,spawnPowerupPosX*3);
             
             Vector3 spawnPos = new Vector3(RandomPosX,spawnYpos,RandomPosZ);
            if(GameObject.FindGameObjectsWithTag("Powerup").Length == 0)
            {
-               Instantiate(powerup,spawnPos,powerup.transform.rotation);
+               Instantiate(powerup[randomIndex],spawnPos,powerup[randomIndex].transform.rotation);
            } 
         }
     }

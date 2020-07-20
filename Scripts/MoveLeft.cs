@@ -22,11 +22,10 @@ public class MoveLeft : MonoBehaviour
         if(spawnManager.isGameActive)
         {
             objectRb.AddForce(Vector3.right * -speed);
-
-            if(transform.position.x < -xDestroy)
-            {
-                Destroy(gameObject);
-            }
+        }
+        if(transform.position.x < -xDestroy)
+        {
+            Destroy(gameObject);
         }
     }
 }
