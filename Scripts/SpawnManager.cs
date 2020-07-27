@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 
 public class SpawnManager : MonoBehaviour
@@ -9,6 +10,9 @@ public class SpawnManager : MonoBehaviour
     public GameObject[] enemiesRight;
     public GameObject[] powerup; 
     public bool isGameActive;
+    public GameObject titleScreen;
+    public Text tmptex;
+    public Button restartGame;
 
     private float spawnYpos = 0.75f;
     private float spawnEnemyPosZ = 8.0f;
@@ -19,16 +23,12 @@ public class SpawnManager : MonoBehaviour
 
     private float spawnPowerupPosX = 20.0f;
 
-    private float startDelay = 3.0f;
     private float spawnEnemyInterval = 5.0f;
-    private float spawnPowerupInterval = 10.0f;
+ 
     // Start is called before the first frame update
     void Start()
     {
-        isGameActive = true;
-        InvokeRepeating("SpawnRandomEnemies",startDelay,spawnEnemyInterval);
-        InvokeRepeating("SpawnEnemiesRight",startDelay,spawnEnemyInterval);
-        InvokeRepeating("SpawnPowerup",startDelay,spawnPowerupInterval);
+ 
     }
 
     // Update is called once per frame
@@ -37,15 +37,36 @@ public class SpawnManager : MonoBehaviour
         
     }
     
-    void RestartGame()
+    public void StartGame(int difficulty)
+    {
+        isGameActive = true;
+        
+        spawnEnemyInterval /= difficulty;
+
+        StartCoroutine(SpawnPowerup(spawnEnemyInterval));
+        StartCoroutine(SpawnEnemiesRight(spawnEnemyInterval));
+        StartCoroutine(SpawnRandomEnemies(spawnEnemyInterval));
+
+        titleScreen.gameObject.SetActive(false);
+    }
+    
+    public void GameOver()
+    {
+        isGameActive = false;
+        tmptex.gameObject.SetActive(true);
+        restartGame.gameObject.SetActive(true);            
+    }
+
+    public void RestartGame()
     {
         SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }
 
-    void SpawnEnemiesRight()
+    IEnumerator SpawnEnemiesRight(float spawnInterval)
     {
-        if(isGameActive)
+        while(isGameActive)
         {
+            yield return new WaitForSeconds(spawnInterval);
             float RandomPosZ = Random.Range(spawnEnemyPosZRight,spawnEnemyPosZRightEnd);
             float RandomPosZodd = Random.Range(spawnEnemyPosZRightEnd * 2  + 1,spawnEnemyPosZRight * 5 + 2);
 
@@ -58,10 +79,12 @@ public class SpawnManager : MonoBehaviour
             Instantiate(enemiesRight[randomIndex],spawnPosOdd,enemiesRight[randomIndex].transform.rotation);
         }
     }
-    void SpawnRandomEnemies()
+    IEnumerator SpawnRandomEnemies(float spawnInterval)
     {
-        if(isGameActive)
+        
+        while(isGameActive)
         {
+           yield return new WaitForSeconds(spawnInterval);
             float RandomPosZ = Random.Range(spawnEnemyPosZ,-spawnEnemyPosZ);
             float RandomPosZodd = Random.Range(spawnEnemyPosZ*5 + 1,spawnEnemyPosZ * 7);
             
@@ -76,10 +99,11 @@ public class SpawnManager : MonoBehaviour
         }
     }
 
-    void SpawnPowerup()
+    IEnumerator SpawnPowerup(float spawnInterval)
     {
-        if(isGameActive)
+        while(isGameActive)
         {
+            yield return new WaitForSeconds(spawnInterval);
             int randomIndex = Random.Range(0,powerup.Length);
             float RandomPosX = Random.Range(spawnPowerupPosX,-spawnPowerupPosX);
             float RandomPosZ = Random.Range(spawnEnemyPosZ,spawnPowerupPosX*3);
