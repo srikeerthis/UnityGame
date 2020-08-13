@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class MoveLeft : MonoBehaviour
 {
-    public float speed = 5.0f;
+    public float speed;
 
     private float xDestroy = 43.0f;
     private Rigidbody objectRb;
@@ -17,7 +17,7 @@ public class MoveLeft : MonoBehaviour
     }
 
     // Update is called once per frame
-    void Update()
+    void FixedUpdate()
     {
         if(spawnManager.isGameActive)
         {

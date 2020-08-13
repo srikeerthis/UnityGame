@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class MoveRight : MonoBehaviour
 {
-    public float speed = 5.0f;
+    public float speed ;
 
     private float xDestroy = 43.0f;
     private Rigidbody objectRb;
@@ -17,11 +17,11 @@ public class MoveRight : MonoBehaviour
     }
 
     // Update is called once per frame
-    void Update()
+    void FixedUpdate()
     {
         if(spawnManager.isGameActive)
         {
-            objectRb.AddForce(Vector3.right * speed);
+            objectRb.AddForce(Vector3.right * speed );
         }
         if(transform.position.x >  xDestroy)
         {

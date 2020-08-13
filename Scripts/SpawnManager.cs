@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using TMPro;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 
@@ -8,13 +9,21 @@ public class SpawnManager : MonoBehaviour
 {
     public GameObject[] enemiesLeft;
     public GameObject[] enemiesRight;
-    public GameObject[] powerup; 
+    public GameObject[] powerup;
+    public GameObject[] trees; 
+    public Button mainMenu;
     public bool isGameActive;
     public GameObject titleScreen;
-    public Text tmptex;
+    public GameObject instructionScreen;
+    public GameObject pauseInstructionScreen;
+    public GameObject pauseScreen;
+    public TextMeshProUGUI ScoreText;
+    public Text gameOverText;
     public Button restartGame;
 
-    private float spawnYpos = 0.75f;
+    private PlayerController player;
+    private int score;
+    private float spawnYpos = 1f;
     private float spawnEnemyPosZ = 8.0f;
     private float spawnEnemyPosX = 50.0f;
 
@@ -23,43 +32,133 @@ public class SpawnManager : MonoBehaviour
 
     private float spawnPowerupPosX = 20.0f;
 
-    private float spawnEnemyInterval = 5.0f;
+    private float spawnEnemyInterval = 6.0f;
  
     // Start is called before the first frame update
     void Start()
     {
- 
+        player = GameObject.Find("Player").GetComponent<PlayerController>();
     }
 
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
-    
     public void StartGame(int difficulty)
     {
-        isGameActive = true;
-        
+        for(int i =0 ;i < trees.Length;i++)
+        trees[i].gameObject.SetActive(true);
+
+        mainMenu.gameObject.SetActive(true);
+        player.joystickRight.gameObject.SetActive(true);
+        player.joystickLeft.gameObject.SetActive(true);
+
+        ScoreText.gameObject.SetActive(true);
+        score = 0;
         spawnEnemyInterval /= difficulty;
 
+        isGameActive = true;   
+        
         StartCoroutine(SpawnPowerup(spawnEnemyInterval));
         StartCoroutine(SpawnEnemiesRight(spawnEnemyInterval));
         StartCoroutine(SpawnRandomEnemies(spawnEnemyInterval));
+        UpdateScore(0);
 
         titleScreen.gameObject.SetActive(false);
     }
     
+    public void UpdateScore(int scoreToAdd)
+    {
+        score += scoreToAdd;
+        ScoreText.text = "Roads Crossed : " + score; 
+    }
+
     public void GameOver()
     {
         isGameActive = false;
-        tmptex.gameObject.SetActive(true);
+        mainMenu.gameObject.SetActive(false);
+        
+        gameOverText.gameObject.SetActive(true);
         restartGame.gameObject.SetActive(true);            
     }
 
     public void RestartGame()
     {
         SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+    }
+
+    public void PauseGame()
+    {
+        Time.timeScale = 0.0f;
+        
+        player.gameObject.SetActive(true);
+        pauseScreen.gameObject.SetActive(true);
+
+        mainMenu.gameObject.SetActive(false);
+        player.joystickLeft.gameObject.SetActive(false);
+        player.joystickRight.gameObject.SetActive(false);
+        pauseInstructionScreen.gameObject.SetActive(false);
+    }
+
+    public void ResumeGame()
+    {
+        isGameActive = true;
+        for(int i =0 ;i < trees.Length;i++)
+        trees[i].gameObject.SetActive(true);
+
+        Time.timeScale = 1.0f;
+        
+        mainMenu.gameObject.SetActive(true);
+        ScoreText.gameObject.SetActive(true);
+        player.joystickLeft.gameObject.SetActive(true);
+        player.joystickRight.gameObject.SetActive(true);
+        player.gameObject.SetActive(true);
+        
+        pauseScreen.gameObject.SetActive(false);
+        titleScreen.gameObject.SetActive(false);
+        instructionScreen.gameObject.SetActive(false);
+    }
+
+    public void StartScreen()
+    {
+        player.gameObject.SetActive(true);
+        titleScreen.gameObject.SetActive(true);
+        
+        isGameActive = false;
+        pauseScreen.gameObject.SetActive(false);
+        mainMenu.gameObject.SetActive(false);
+        instructionScreen.gameObject.SetActive(false);
+    }
+
+    public void Instructions()
+    {
+        instructionScreen.gameObject.SetActive(true);
+        
+        for(int i =0 ;i < trees.Length;i++)
+        trees[i].gameObject.SetActive(false);
+       
+        ScoreText.gameObject.SetActive(false);
+        mainMenu.gameObject.SetActive(false);
+        player.gameObject.SetActive(false);
+        pauseScreen.gameObject.SetActive(false);
+        titleScreen.gameObject.SetActive(false);
+        
+    }
+
+    public void PauseInstructions()
+    {
+        pauseInstructionScreen.gameObject.SetActive(true);
+        
+        for(int i =0 ;i < trees.Length;i++)
+        trees[i].gameObject.SetActive(false);
+       
+        ScoreText.gameObject.SetActive(false);
+        mainMenu.gameObject.SetActive(false);
+        player.gameObject.SetActive(false);
+        pauseScreen.gameObject.SetActive(false);
+        titleScreen.gameObject.SetActive(false);
+        
+    }
+
+    public void ExitGame()
+    {
+        Application.Quit();
     }
 
     IEnumerator SpawnEnemiesRight(float spawnInterval)
